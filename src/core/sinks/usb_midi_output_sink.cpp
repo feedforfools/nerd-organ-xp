@@ -6,7 +6,7 @@ UsbMidiOutputSink::UsbMidiOutputSink(PortId id, MIDIDevice* device)
 
 void UsbMidiOutputSink::onMusicalEvent(const MusicalEvent& event)
 {
-    Logger::log("Sending MIDI event: " + String(int(event.type)) + " on port " + String(portId) + " with data1: " + String(event.data1) + ", data2: " + String(event.data2));
+    Logger::log("[USB] Sending MIDI event: " + String(int(event.type)) + " on port " + String(portId) + " with data1: " + String(event.data1) + ", data2: " + String(event.data2));
     switch (event.type)
     {   
         case MusicalEventType::NOTE_ON:

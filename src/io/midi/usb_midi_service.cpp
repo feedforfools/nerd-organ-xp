@@ -2,6 +2,7 @@
 
 #include "core/sources/usb_midi_input_source.h"
 #include "core/sinks/usb_midi_output_sink.h"
+#include "core/processing/note_processor.h"
 #include "utils/logger.h"
 
 UsbMidiService::UsbMidiService(RoutingManager& routingManager)
@@ -44,8 +45,13 @@ void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
         // Allocate new source and sink for the device and register them
         auto* newSource = new UsbMidiInputSource(newPortId, midiDevice);
         auto* newSink = new UsbMidiOutputSink(newPortId, midiDevice);
+        auto* newProcessor = new NoteProcessor(240);
         routingManager.addSource(newSource);
         routingManager.addSink(newSink);
+        routingManager.addProcessor(newProcessor);
+        routingManager.createRoute(PORT_ID_KEYBED, newProcessor->getPortId());
+        routingManager.createRoute(newProcessor->getPortId(), newSink->getPortId());
+
         activePorts[device] = {newSource, newSink};
 
         Logger::log("Created Source/Sink for new USB MIDI device with Port ID: " + String(newPortId));
@@ -68,7 +74,7 @@ void UsbMidiService::onUsbDeviceDisconnected(USBDriver* device, AppDeviceType ty
         routingManager.removeSink(it->second.sink);
         delete it->second.source;
         delete it->second.sink;
-        
+
         releasePortId(portIdToRelease);
         activePorts.erase(it);
 
