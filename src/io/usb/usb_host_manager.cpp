@@ -5,6 +5,10 @@
 UsbHostManager::UsbHostManager()
 {
     int driverIndex = 0;
+
+    // Add custom JD08 device first
+    allDrivers[driverIndex++] = &jd08Device;
+
     for (int i = 0; i < NUM_USB_MIDI_DEVICES; ++i)
     {
         allDrivers[driverIndex++] = &midiDevices[i];
@@ -36,11 +40,16 @@ void UsbHostManager::update()
 
         AppDeviceType deviceType = AppDeviceType::UNKNOWN;
 
-        if (i < NUM_USB_MIDI_DEVICES)
+        if (driver == &jd08Device)
         {
             deviceType = AppDeviceType::MIDI;
         }
-        else if (i < NUM_USB_MIDI_DEVICES + NUM_USB_STORAGE_DEVICES)
+
+        else if (driver >= &midiDevices[0] && driver <= &midiDevices[NUM_USB_MIDI_DEVICES - 1])
+        {
+            deviceType = AppDeviceType::MIDI;
+        }
+        else if (driver >= &driveDevices[0] && driver <= &driveDevices[NUM_USB_STORAGE_DEVICES - 1])
         {
             deviceType = AppDeviceType::STORAGE;
         }

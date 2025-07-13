@@ -5,11 +5,12 @@
 #include <vector>
 
 #include "config/config.h"
+#include "io/usb/drivers/jd08.h"
 
-#define NUM_USB_MIDI_DEVICES 4
+#define NUM_USB_MIDI_DEVICES 3
 #define NUM_USB_STORAGE_DEVICES 4 
 // Total number of USB driver instances the manager will check
-#define TOTAL_USB_DRIVERS (NUM_USB_MIDI_DEVICES + NUM_USB_STORAGE_DEVICES)
+#define TOTAL_USB_DRIVERS (NUM_USB_MIDI_DEVICES + NUM_USB_STORAGE_DEVICES + 1)
 
 enum class AppDeviceType // Avoiding RTTI
 {
@@ -45,7 +46,8 @@ class UsbHostManager
         USBHub hub1{usbHost};
 
         USBDrive driveDevices[NUM_USB_STORAGE_DEVICES]{usbHost, usbHost, usbHost, usbHost};
-        MIDIDevice midiDevices[NUM_USB_MIDI_DEVICES]{usbHost, usbHost, usbHost, usbHost};
+        MIDIDevice midiDevices[NUM_USB_MIDI_DEVICES]{usbHost, usbHost, usbHost};
+        JD08_MIDI jd08Device{usbHost};
 
         USBDriver* allDrivers[TOTAL_USB_DRIVERS];
         DeviceState allDeviceStates[TOTAL_USB_DRIVERS];        

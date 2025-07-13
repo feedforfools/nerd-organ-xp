@@ -1445,7 +1445,6 @@ protected:
     void send_sysex_buffer_has_term(const uint8_t *data, uint32_t length, uint8_t cable);
     void send_sysex_add_term_bytes(const uint8_t *data, uint32_t length, uint8_t cable);
     void sysex_byte(uint8_t b);
-private:
     Pipe_t *rxpipe;
     Pipe_t *txpipe;
     USBDriverTimer txtimer;
