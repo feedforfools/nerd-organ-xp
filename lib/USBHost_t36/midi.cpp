@@ -268,6 +268,8 @@ void MIDIDeviceBase::rx_data(const Transfer_t *transfer)
 
 void MIDIDeviceBase::tx_data(const Transfer_t *transfer)
 {
+	Serial.printf(">>>> tx_data CALLBACK FIRED! Transfer complete\n");
+
 	println("MIDIDevice transmit complete");
 	print("  MIDI Data: ");
 	print_hexbytes(transfer->buffer, tx_size);
@@ -291,6 +293,8 @@ void MIDIDeviceBase::disconnect()
 
 void MIDIDeviceBase::write_packed(uint32_t data)
 {
+	Serial.printf("MIDIDeviceBase::write_packed(0x%08X)\n", data);
+
 	if (!txpipe) return;
 	uint32_t tx_max = tx_size / 4;
 	while (1) {
