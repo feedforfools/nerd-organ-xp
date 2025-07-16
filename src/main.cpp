@@ -30,8 +30,9 @@ KeyboardScanner keyboardScanner;
 SwitchManager switchManager;
 ControlMapper controlMapper;
 KeybedSource keybedSource;
-NoteProcessor noteProcessor1(200); // TODO: Create a method for generating unique port IDs
-NoteProcessor noteProcessor2(201);
+NoteProcessor noteProcessor1(150); // TODO: Create a method for generating unique port IDs
+NoteProcessor noteProcessor2(151);
+NoteProcessor noteProcessor3(152); // For Nerd Pico
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI_IN_1);
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI_OUT_1);
@@ -65,6 +66,7 @@ void setup()
    routingManager.addSink(&hwMidiOut2);
    routingManager.addProcessor(&noteProcessor1);
    routingManager.addProcessor(&noteProcessor2);
+   routingManager.addProcessor(&noteProcessor3); // For Nerd Pico
 
    Logger::log("Initializing USB Host System...");
    usbHostManager.init();
@@ -80,6 +82,10 @@ void setup()
    Logger::log("Creating default routes and mappings...");
    routingManager.createRoute(PORT_ID_KEYBED, noteProcessor1.getPortId());
    routingManager.createRoute(noteProcessor1.getPortId(), PORT_ID_HW_MIDI_OUT_1);
+   routingManager.createRoute(PORT_ID_KEYBED, noteProcessor2.getPortId());
+   routingManager.createRoute(noteProcessor2.getPortId(), PORT_ID_HW_MIDI_OUT_2);
+   routingManager.createRoute(200, noteProcessor3.getPortId()); // For Nerd Pico, dynamic port ID (200 is the first USB port ID)
+   routingManager.createRoute(noteProcessor3.getPortId(), PORT_ID_HW_MIDI_OUT_2); // For Nerd Pico
    // Control mappings
    controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &noteProcessor1, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
    controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 1, .target = &noteProcessor1, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
