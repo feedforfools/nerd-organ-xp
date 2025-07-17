@@ -49,7 +49,7 @@ void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
         routingManager.addSource(newSource);
         routingManager.addSink(newSink);
         routingManager.addProcessor(newProcessor);
-        routingManager.createRoute(PORT_ID_KEYBED, newProcessor->getPortId());
+        routingManager.createRoute(newSource->getPortId(), newProcessor->getPortId());
         routingManager.createRoute(newProcessor->getPortId(), PORT_ID_HW_MIDI_OUT_2);
 
         activePorts[device] = {newSource, newSink};

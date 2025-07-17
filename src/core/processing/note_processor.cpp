@@ -6,10 +6,18 @@ void NoteProcessor::onMusicalEvent(const MusicalEvent& event)
 {
     if (!isEnabled) return;
 
-    // 1. Filter by note range (for splits/layers)
-    if (event.type == MusicalEventType::NOTE_ON || event.type == MusicalEventType::NOTE_ON_HIGH_TRIGGER || event.type == MusicalEventType::NOTE_OFF)
-    {
-        if (event.data1 < minNote || event.data1 > maxNote) return; // Ignore notes out of range
+    // 1. Filter by MIDI event type
+    switch (event.type) {
+        case MusicalEventType::NOTE_ON:
+        case MusicalEventType::NOTE_ON_HIGH_TRIGGER:
+        case MusicalEventType::NOTE_OFF:
+            // Let note events fall through to the existing logic.
+            break;
+        default:
+            // For any other event type (Pitch Bend, CC, etc.),
+            // just forward it without alteration.
+            fireEvent(event);
+            return;
     }
 
     // 2. Filter by trigger type
