@@ -12,6 +12,7 @@ void UsbMidiInputSource::update()
         event.channel = midiDevice->getChannel();
         event.data1 = midiDevice->getData1();
         event.data2 = midiDevice->getData2();
+        Logger::log("[Valid USB MIDI] event: " + String(int(event.type)) + " on port " + String(portId) + " with data1: " + String(event.data1) + ", data2: " + String(event.data2));
 
         bool isValidEvent = true;
 
@@ -46,6 +47,7 @@ void UsbMidiInputSource::update()
 
         if (isValidEvent)
         {
+            Logger::log("[Valid USB MIDI] event: " + String(int(event.type)) + " on port " + String(portId) + " with data1: " + String(event.data1) + ", data2: " + String(event.data2));
             fireEvent(event);
         }
     }

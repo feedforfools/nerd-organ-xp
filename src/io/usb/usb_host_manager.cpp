@@ -6,8 +6,8 @@ UsbHostManager::UsbHostManager()
 {
     int driverIndex = 0;
 
-    // Add custom JD08 device first
-    allDrivers[driverIndex++] = &jd08Device;
+    // Add custom Pico device first
+    allDrivers[driverIndex++] = &picoDevice;
 
     for (int i = 0; i < NUM_USB_MIDI_DEVICES; ++i)
     {
@@ -40,7 +40,7 @@ void UsbHostManager::update()
 
         AppDeviceType deviceType = AppDeviceType::UNKNOWN;
 
-        if (driver == &jd08Device)
+        if (driver == &picoDevice)
         {
             deviceType = AppDeviceType::MIDI;
         }

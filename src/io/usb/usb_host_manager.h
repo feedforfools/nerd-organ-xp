@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "config/config.h"
-#include "io/usb/drivers/jd08.h"
+#include "io/usb/drivers/pico.h"
 
 #define NUM_USB_MIDI_DEVICES 3
 #define NUM_USB_STORAGE_DEVICES 4 
@@ -47,7 +47,7 @@ class UsbHostManager
 
         USBDrive driveDevices[NUM_USB_STORAGE_DEVICES]{usbHost, usbHost, usbHost, usbHost};
         MIDIDevice midiDevices[NUM_USB_MIDI_DEVICES]{usbHost, usbHost, usbHost};
-        JD08_MIDI jd08Device{usbHost};
+        PICO_MIDI picoDevice{usbHost};
 
         USBDriver* allDrivers[TOTAL_USB_DRIVERS];
         DeviceState allDeviceStates[TOTAL_USB_DRIVERS];        

@@ -45,12 +45,12 @@ void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
         // Allocate new source and sink for the device and register them
         auto* newSource = new UsbMidiInputSource(newPortId, midiDevice);
         auto* newSink = new UsbMidiOutputSink(newPortId, midiDevice);
-        auto* newProcessor = new NoteProcessor(240);
+        auto* newProcessor = new NoteProcessor(152);
         routingManager.addSource(newSource);
         routingManager.addSink(newSink);
         routingManager.addProcessor(newProcessor);
         routingManager.createRoute(PORT_ID_KEYBED, newProcessor->getPortId());
-        routingManager.createRoute(newProcessor->getPortId(), newSink->getPortId());
+        routingManager.createRoute(newProcessor->getPortId(), PORT_ID_HW_MIDI_OUT_2);
 
         activePorts[device] = {newSource, newSink};
 
