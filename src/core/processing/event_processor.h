@@ -1,13 +1,13 @@
-#ifndef NOTE_PROCESSOR_H
-#define NOTE_PROCESSOR_H
+#ifndef EVENT_PROCESSOR_H
+#define EVENT_PROCESSOR_H
 
 #include "core/interfaces.h"
 #include "types/controllable.h"
 
-class NoteProcessor : public IMusicalEventProcessor, public IControllable
+class EventProcessor : public IMusicalEventProcessor, public IControllable
 {
     public:
-        NoteProcessor(PortId portId);
+        EventProcessor(PortId portId);
 
         void onMusicalEvent(const MusicalEvent& event) override;
         inline PortId getPortId() const override { return portId; }
