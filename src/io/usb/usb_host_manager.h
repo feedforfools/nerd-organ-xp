@@ -6,11 +6,6 @@
 
 #include "config/config.h"
 
-#define NUM_USB_MIDI_DEVICES 4
-#define NUM_USB_STORAGE_DEVICES 4 
-// Total number of USB driver instances the manager will check
-#define TOTAL_USB_DRIVERS (NUM_USB_MIDI_DEVICES + NUM_USB_STORAGE_DEVICES)
-
 enum class AppDeviceType // Avoiding RTTI
 {
     MIDI,

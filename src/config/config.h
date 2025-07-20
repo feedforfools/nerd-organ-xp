@@ -41,8 +41,9 @@ const byte USB_STATUS_PIN = 30;                             // Pin to read the s
 #define MIDI_STARTING_NOTE      36                          // MIDI note number for the first key (C2)
 
 // USB configuration
-#define MAX_USB_MIDI_DEVICES    6                           // Maximum number of USB MIDI devices supported
-#define MAX_USB_STORAGE_DEVICES 4
+#define NUM_USB_MIDI_DEVICES    4
+#define NUM_USB_STORAGE_DEVICES 4 
+#define TOTAL_USB_DRIVERS (NUM_USB_MIDI_DEVICES + NUM_USB_STORAGE_DEVICES) // Total number of USB driver instances the manager will check
 
 
 #endif
