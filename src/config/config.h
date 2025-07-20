@@ -9,9 +9,13 @@
 #define NUM_KEYS_PER_BANK       8                           // number of keys in each bank
 #define NUM_BANKS               8                           // number of group of keys (for Fatar 61 they're arranged in 8 banks)
 #define NUM_KEYZONES            2
+#define NUM_CONTACTS            2                           // number of contacts per key (top and bottom)
 #define NUM_BIT_MPLX            3
-#define LEFT                    0                           // Alias for left keyzone
-#define RIGHT                   1                           // Alias for right keyzone
+#define NUM_DEBOUNCE_CYCLES     3                           // number of cycles of the keybed scanning for debouncing each key
+#define LEFT                    0                           // alias for left keyzone
+#define RIGHT                   1                           // alias for right keyzone
+#define TOP                     0                           // alias for top contact of the key
+#define BOTTOM                  1                           // alias for bottom contact of the key
 
 // MIDI ports configuration
 #define NUM_HW_MIDI_OUT_PORTS   2

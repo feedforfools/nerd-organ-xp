@@ -22,6 +22,7 @@ class KeyboardScanner
         bank_t banks[NUM_BANKS];
         bank_t prev_banks[NUM_BANKS];
         key_fatar_t keys[NUM_KEYS];
+        uint8_t debounceCounters[NUM_KEYS][NUM_CONTACTS];
         
         teensy_port_reg mplxEnable[NUM_KEYZONES];
         teensy_port_reg mplxAddress[NUM_BIT_MPLX];

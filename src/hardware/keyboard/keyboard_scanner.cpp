@@ -61,6 +61,8 @@ void KeyboardScanner::initializeKeys()
         keys[i].state = KEY_IS_UP;
         keys[i].t = 0;
     }
+
+    memset(debounceCounters, 0, sizeof(debounceCounters));
 }
 
 void KeyboardScanner::registerListener(IKeyEventListener *listener)
@@ -106,34 +108,82 @@ void KeyboardScanner::scan()
 
 void KeyboardScanner::processScanResults()
 {
-    for (int i = 0; i < NUM_BANKS; ++i)
+    for (int bankIndex = 0; bankIndex < NUM_BANKS; ++bankIndex)
     {
-        // Check top key contacts
-        byte breaksDiff = banks[i].breaks ^ prev_banks[i].breaks;
-        if (breaksDiff)
+        byte currentBreaks = banks[bankIndex].breaks;
+        byte previousBreaks = prev_banks[bankIndex].breaks;
+        byte currentMakes = banks[bankIndex].makes;
+        byte previousMakes = prev_banks[bankIndex].makes;
+
+        // TODO: Debounce also the inverse contact changes (from pressed to released)
+        for (int keyInBankIndex = 0; keyInBankIndex < NUM_KEYS_PER_BANK; ++keyInBankIndex)
         {
-            for (int j = 0; j < NUM_KEYS_PER_BANK; ++j)
+            uint8_t keyIndex = bankIndex + keyInBankIndex * NUM_KEYS_PER_BANK;
+            if (keyIndex >= NUM_KEYS) continue;
+
+            // Check top contacts (breaks)
+            bool currentBreakState = bitRead(currentBreaks, keyInBankIndex);
+            bool previousBreakState = bitRead(previousBreaks, keyInBankIndex);
+            // Debouncing key touch events
+            if (debounceCounters[keyIndex][TOP] > 0)
             {
-                if (bitRead(breaksDiff, j))
+                if (currentBreakState)
                 {
-                    uint8_t keyIndex = i + j * NUM_KEYS_PER_BANK;
-                    event_t event = bitRead(banks[i].breaks, j) ? KEY_TOUCHED : KEY_TOP;
-                    triggerKeyEvent(keyIndex, event);
+                    ++debounceCounters[keyIndex][TOP]; // Continue debouncing
+                    if (debounceCounters[keyIndex][TOP] >= NUM_DEBOUNCE_CYCLES)
+                    {
+                        // Debounce complete => trigger key event
+                        triggerKeyEvent(keyIndex, KEY_TOUCHED);
+                        debounceCounters[keyIndex][TOP] = 0; // Reset debounce counter
+                    }
+                }
+                else 
+                {
+                    debounceCounters[keyIndex][TOP] = 0;
                 }
             }
-        }
-
-        // Check bottom key contacts
-        byte makesDiff = banks[i].makes ^ prev_banks[i].makes;
-        if (makesDiff)
-        {
-            for (int j = 0; j < NUM_KEYS_PER_BANK; ++j)
+            else
             {
-                if (bitRead(makesDiff, j))
+                if (currentBreakState && !previousBreakState)
                 {
-                    uint8_t keyIndex = i + j * NUM_KEYS_PER_BANK;
-                    event_t event = bitRead(banks[i].makes, j) ? KEY_PRESSED : KEY_RELEASED;
-                    triggerKeyEvent(keyIndex, event);
+                    ++debounceCounters[keyIndex][TOP]; // Start debouncing
+                } 
+                else if (!currentBreakState && previousBreakState)
+                {
+                    triggerKeyEvent(keyIndex, KEY_TOP); // Key released (no debounce here)
+                }
+            }
+
+            // Check bottom contacts (makes)
+            bool currentMakeState = bitRead(currentMakes, keyInBankIndex);
+            bool previousMakeState = bitRead(previousMakes, keyInBankIndex);
+            // Debouncing key touch events
+            if (debounceCounters[keyIndex][BOTTOM] > 0)
+            {
+                if (currentMakeState)
+                {
+                    ++debounceCounters[keyIndex][BOTTOM]; // Continue debouncing
+                    if (debounceCounters[keyIndex][BOTTOM] >= NUM_DEBOUNCE_CYCLES)
+                    {
+                        // Debounce complete => trigger key event
+                        triggerKeyEvent(keyIndex, KEY_PRESSED);
+                        debounceCounters[keyIndex][BOTTOM] = 0; // Reset debounce counter
+                    }
+                }
+                else
+                {
+                    debounceCounters[keyIndex][BOTTOM] = 0;
+                }
+            }
+            else
+            {
+                if (currentMakeState && !previousMakeState)
+                {
+                    ++debounceCounters[keyIndex][BOTTOM]; // Start debouncing
+                }
+                else if (!currentMakeState && previousMakeState)
+                {
+                    triggerKeyEvent(keyIndex, KEY_RELEASED); // Key released (no debounce here)
                 }
             }
         }
