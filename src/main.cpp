@@ -48,8 +48,7 @@ HwMidiOutputSink hwMidiOut2(PORT_ID_HW_MIDI_OUT_2, MIDI_OUT_2);
 
 void setup()
 {
-   Serial.begin(9600);
-   while (!Serial && millis() < 4000);
+   Logger::begin();
    Logger::log("\n--- Nerd Organ XP initializing ---");
 
    Logger::log("Initializing Core Systems (Routing, Switches, Keyboard)...");
@@ -91,7 +90,7 @@ void setup()
    controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 1, .target = &noteProcessor1, .parameter = ControllableParameter::PROCESSOR_MIDI_CHANNEL, .value = NORD_2ND_MANUAL_MIDI_CHANNEL});
 
    Logger::log("--- Initialization complete, starting main loop ---");
-   Serial.flush();
+   Logger::flush();
 }
 
 void loop()

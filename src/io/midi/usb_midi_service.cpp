@@ -85,7 +85,6 @@ void UsbMidiService::initializePortIds()
     }
     numAvailablePortIds = MAX_USB_PORTS;
     Logger::log("Initialized USB MIDI port IDs from " + String(PORT_ID_USB_BASE) + " to " + String(PORT_ID_USB_MAX));
-    Serial.flush();
 }
 
 PortId UsbMidiService::acquirePortId()
