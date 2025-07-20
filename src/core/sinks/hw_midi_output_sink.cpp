@@ -23,11 +23,15 @@ void HwMidiOutputSink::onMusicalEvent(const MusicalEvent& event)
             midi.sendProgramChange(event.data1, event.channel);
             break;
         case MusicalEventType::PITCH_BEND:
+        {
             // Combine data1 and data2 into a single 14-bit value for pitch bend
             // MIDI pitch bend uses a 14-bit value, where data1 is the LSB and data2 is the MSB
             // The pitch bend value is in the range of -8192 to 8191
-            midi.sendPitchBend(int16_t((event.data2 << 7) | event.data1), event.channel);
+            int pitchValue = (event.data2 << 7) | event.data1; // Combine data1 and data2
+            pitchValue -= 8192; // Adjust to -8192 to 8191 range
+            midi.sendPitchBend(pitchValue, event.channel);
             break;
+        }
         // TODO: Implement additional MIDI message types as needed
         default:
             Logger::log("Unsupported MIDI message type for sending");
