@@ -30,9 +30,8 @@ KeyboardScanner keyboardScanner;
 SwitchManager switchManager;
 ControlMapper controlMapper;
 KeybedSource keybedSource;
-EventProcessor eventProcessor1(150); // TODO: Create a method for generating unique port IDs
-EventProcessor eventProcessor2(151);
-EventProcessor eventProcessor3(152); // For Nerd Pico
+EventProcessor nordProcessor(PORT_ID_NORD_PROCESSOR); // TODO: Create a method for generating unique port IDs
+EventProcessor jd08Processor(PORT_ID_JD08_PROCESSOR);
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI_IN_1);
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI_OUT_1);
@@ -63,9 +62,8 @@ void setup()
    routingManager.addSource(&hwMidiIn2);
    routingManager.addSink(&hwMidiOut1);
    routingManager.addSink(&hwMidiOut2);
-   routingManager.addProcessor(&eventProcessor1);
-   routingManager.addProcessor(&eventProcessor2);
-   routingManager.addProcessor(&eventProcessor3); // For Nerd Pico
+   routingManager.addProcessor(&nordProcessor);
+   routingManager.addProcessor(&jd08Processor);
 
    Logger::log("Initializing USB Host System...");
    usbHostManager.init();
@@ -79,21 +77,19 @@ void setup()
    usbHostManager.addListener(&usbMidiService);
 
    Logger::log("Creating default routes and mappings...");
-   routingManager.createRoute(PORT_ID_KEYBED, eventProcessor1.getPortId());
-   routingManager.createRoute(eventProcessor1.getPortId(), PORT_ID_HW_MIDI_OUT_1);
-   routingManager.createRoute(PORT_ID_KEYBED, eventProcessor2.getPortId());
-   routingManager.createRoute(eventProcessor2.getPortId(), PORT_ID_HW_MIDI_OUT_2);
-   routingManager.createRoute(200, eventProcessor3.getPortId()); // For Nerd Pico, dynamic port ID (200 is the first USB port ID)
-   routingManager.createRoute(eventProcessor3.getPortId(), PORT_ID_HW_MIDI_OUT_2); // For Nerd Pico
+   routingManager.createRoute(PORT_ID_KEYBED, nordProcessor.getPortId());
+   routingManager.createRoute(nordProcessor.getPortId(), PORT_ID_HW_MIDI_OUT_1);
+   routingManager.createRoute(PORT_ID_KEYBED, jd08Processor.getPortId());
+   routingManager.createRoute(jd08Processor.getPortId(), PORT_ID_HW_MIDI_OUT_2); // Backup route for HW MIDI OUT 2 (but in reality JD08 will be connected to USB only)
    // Control mappings
-   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &eventProcessor1, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
-   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 1, .target = &eventProcessor1, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
-   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &eventProcessor2, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
-   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 2, .target = &eventProcessor2, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
-   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 0, .target = &eventProcessor1, .parameter = ControllableParameter::PROCESSOR_HIGH_TRIGGER_MODE, .value = 0});
-   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 1, .target = &eventProcessor1, .parameter = ControllableParameter::PROCESSOR_HIGH_TRIGGER_MODE, .value = 1});
-   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 0, .target = &eventProcessor1, .parameter = ControllableParameter::PROCESSOR_MIDI_CHANNEL, .value = NORD_MAIN_MIDI_CHANNEL});
-   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 1, .target = &eventProcessor1, .parameter = ControllableParameter::PROCESSOR_MIDI_CHANNEL, .value = NORD_2ND_MANUAL_MIDI_CHANNEL});
+   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
+   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 1, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
+   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &jd08Processor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
+   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 2, .target = &jd08Processor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
+   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 0, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_HIGH_TRIGGER_MODE, .value = 0});
+   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 1, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_HIGH_TRIGGER_MODE, .value = 1});
+   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 0, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_MIDI_CHANNEL, .value = NORD_MAIN_MIDI_CHANNEL});
+   controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 1, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_MIDI_CHANNEL, .value = NORD_2ND_MANUAL_MIDI_CHANNEL});
 
    Logger::log("--- Initialization complete, starting main loop ---");
    Logger::flush();

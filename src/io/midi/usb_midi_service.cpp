@@ -28,30 +28,61 @@ void UsbMidiService::update()
 
 void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
 {
-    if (type == AppDeviceType::MIDI)
+    switch (type)
     {
-        Logger::log("UsbMidiService: MIDI USB Device Connected!");
-
-        MIDIDevice_BigBuffer* midiDevice = static_cast<MIDIDevice_BigBuffer*>(device);
-
-        PortId newPortId = acquirePortId();
-        if (newPortId == 0)
+        case AppDeviceType::MIDI:
         {
-            Logger::log("Error: No more USB port IDs available");
-            return;
+            Logger::log("UsbMidiService: MIDI USB Device Connected!");
+            MIDIDevice_BigBuffer* midiDevice = static_cast<MIDIDevice_BigBuffer*>(device);
+
+            uint16_t vendorId = midiDevice->idVendor();
+            uint16_t productId = midiDevice->idProduct();
+            PortId newDevicePortId;
+
+            if (vendorId == JD08_VENDOR_ID && productId == JD08_PRODUCT_ID)
+            {
+                Logger::log("UsbMidiService: JD08 MIDI device connected, proceeding with registration");
+                newDevicePortId = PORT_ID_JD08; // Use predefined port ID for JD-08
+                auto *newSink = new UsbMidiOutputSink(newDevicePortId, midiDevice);
+                routingManager.addSink(newSink);
+                routingManager.createRoute(PORT_ID_JD08_PROCESSOR, PORT_ID_JD08);
+                Logger::log("Created Sink for Roland JD08 USB MIDI device with Port ID: " + String(newDevicePortId));
+            } 
+            else if (vendorId == NERD_PICO_VENDOR_ID && productId == NERD_PICO_PRODUCT_ID)
+            {
+                Logger::log("UsbMidiService: Nerd Pico MIDI device connected, proceeding with registration");
+                newDevicePortId = PORT_ID_NERD_PICO; // Use predefined port ID for Nerd Pico
+                auto *newSource = new UsbMidiInputSource(newDevicePortId, midiDevice);
+                routingManager.addSource(newSource);
+                routingManager.createRoute(PORT_ID_NERD_PICO, PORT_ID_JD08_PROCESSOR);
+                Logger::log("Created Source for Nerd Pico USB MIDI controller with Port ID: " + String(newDevicePortId));
+            }
+            else
+            {
+                Logger::log("UsbMidiService: Generic MIDI device connected, proceeding with registration");
+                newDevicePortId = acquirePortId();
+                if (newDevicePortId == 0)
+                {
+                    Logger::log("Error: No more USB port IDs available for new MIDI device. Registration failed.");
+                    return;
+                }
+                // Allocate new source and sink for the device and register them
+                auto* newSource = new UsbMidiInputSource(newDevicePortId, midiDevice);
+                auto* newSink = new UsbMidiOutputSink(newDevicePortId, midiDevice);
+                routingManager.addSource(newSource);
+                routingManager.addSink(newSink);
+                activePorts[device] = {newSource, newSink};
+                Logger::log("Created Source/Sink for new USB MIDI device with Port ID: " + String(newDevicePortId));
+            }
+
+            break;
         }
-
-        // Allocate new source and sink for the device and register them
-        auto* newSource = new UsbMidiInputSource(newPortId, midiDevice);
-        auto* newSink = new UsbMidiOutputSink(newPortId, midiDevice);
-        routingManager.addSource(newSource);
-        routingManager.addSink(newSink);
-        activePorts[device] = {newSource, newSink};
-
-        Logger::log("Created Source/Sink for new USB MIDI device with Port ID: " + String(newPortId));
-    } else
-    {
-        Logger::log("UsbMidiService: Device is not a MIDI device, ignoring connection");
+        case AppDeviceType::STORAGE:
+            // Handle storage device connection
+            return; // Ignore storage devices for now
+        default:
+            Logger::log("UsbMidiService: Unknown USB device type connected, ignoring");
+            return; // Ignore unknown types
     }
 }
 

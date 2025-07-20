@@ -45,5 +45,10 @@ const byte USB_STATUS_PIN = 30;                             // Pin to read the s
 #define NUM_USB_STORAGE_DEVICES 4 
 #define TOTAL_USB_DRIVERS (NUM_USB_MIDI_DEVICES + NUM_USB_STORAGE_DEVICES) // Total number of USB driver instances the manager will check
 
+// Custom device properties
+#define JD08_VENDOR_ID          0x0582
+#define JD08_PRODUCT_ID         0x028C
+#define NERD_PICO_VENDOR_ID     0x16C0
+#define NERD_PICO_PRODUCT_ID    0x0485
 
 #endif
