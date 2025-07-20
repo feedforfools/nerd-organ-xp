@@ -43,9 +43,12 @@ void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
             {
                 Logger::log("UsbMidiService: JD08 MIDI device connected, proceeding with registration");
                 newDevicePortId = PORT_ID_JD08; // Use predefined port ID for JD-08
+                auto *newSource = new UsbMidiInputSource(newDevicePortId, midiDevice);
                 auto *newSink = new UsbMidiOutputSink(newDevicePortId, midiDevice);
+                routingManager.addSource(newSource); // Not used
                 routingManager.addSink(newSink);
                 routingManager.createRoute(PORT_ID_JD08_PROCESSOR, PORT_ID_JD08);
+                activePorts[device] = {newSource, newSink};
                 Logger::log("Created Sink for Roland JD08 USB MIDI device with Port ID: " + String(newDevicePortId));
             } 
             else if (vendorId == NERD_PICO_VENDOR_ID && productId == NERD_PICO_PRODUCT_ID)
@@ -53,8 +56,11 @@ void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
                 Logger::log("UsbMidiService: Nerd Pico MIDI device connected, proceeding with registration");
                 newDevicePortId = PORT_ID_NERD_PICO; // Use predefined port ID for Nerd Pico
                 auto *newSource = new UsbMidiInputSource(newDevicePortId, midiDevice);
+                auto *newSink = new UsbMidiOutputSink(newDevicePortId, midiDevice);
                 routingManager.addSource(newSource);
+                routingManager.addSink(newSink); // Not used
                 routingManager.createRoute(PORT_ID_NERD_PICO, PORT_ID_JD08_PROCESSOR);
+                activePorts[device] = {newSource, newSink};
                 Logger::log("Created Source for Nerd Pico USB MIDI controller with Port ID: " + String(newDevicePortId));
             }
             else
