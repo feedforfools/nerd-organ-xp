@@ -5,7 +5,9 @@ UsbMidiInputSource::UsbMidiInputSource(PortId id, MIDIDevice_BigBuffer* device) 
 
 void UsbMidiInputSource::update()
 {
-    if (midiDevice->read())
+
+    int messagesProcessed = 0;
+    while (messagesProcessed < MAX_MESSAGES_PER_CYCLE && midiDevice->read())
     {
         MusicalEvent event;
         event.sourcePortId = portId;
@@ -43,5 +45,7 @@ void UsbMidiInputSource::update()
         {
             fireEvent(event);
         }
+
+        ++messagesProcessed;
     }
 }

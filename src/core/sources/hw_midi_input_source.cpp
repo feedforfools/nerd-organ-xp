@@ -1,4 +1,5 @@
 #include "hw_midi_input_source.h"
+#include "config/config.h"
 #include "utils/logger.h"
 
 HwMidiInputSource::HwMidiInputSource(PortId id, MIDI_NAMESPACE::MidiInterface<MIDI_NAMESPACE::SerialMIDI<HardwareSerial>>& midiInstance) : portId(id), midi(midiInstance) {}
@@ -11,7 +12,9 @@ void HwMidiInputSource::init()
 
 void HwMidiInputSource::update()
 {
-    if (midi.read())
+
+    int messagesProcessed = 0;
+    while (messagesProcessed < MAX_MESSAGES_PER_CYCLE && midi.read())
     {
         MusicalEvent event;
         event.sourcePortId = portId;
@@ -49,5 +52,7 @@ void HwMidiInputSource::update()
         {
             fireEvent(event);
         }
+
+        ++messagesProcessed;
     }
 }

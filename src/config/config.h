@@ -39,6 +39,7 @@ const byte USB_STATUS_PIN = 30;                             // Pin to read the s
 #define MIDI_CHANNEL_OMNI       0                           // MIDI channel for omni mode (0 means all channels)
 #define HIGH_TRIG_VELOCITY      1
 #define MIDI_STARTING_NOTE      36                          // MIDI note number for the first key (C2)
+#define MAX_MESSAGES_PER_CYCLE  25                          // Maximum number of MIDI messages from sources to process in one cycle
 
 // USB configuration
 #define NUM_USB_MIDI_DEVICES    4
