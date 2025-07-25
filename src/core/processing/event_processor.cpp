@@ -51,6 +51,22 @@ void EventProcessor::onMusicalEvent(const MusicalEvent& event)
     fireEvent(processedEvent);
 }
 
+void EventProcessor::setEnabled(bool enabled)
+{
+    isEnabled = enabled;
+    if (!isEnabled)
+    {
+        // Sending a CC 120 (All Sound Off) message to the port when disabling the processor => avoid stuck notes
+        MusicalEvent allSoundOffEvent;
+        allSoundOffEvent.type = MusicalEventType::CONTROL_CHANGE;
+        allSoundOffEvent.sourcePortId = portId;
+        allSoundOffEvent.channel = midiChannel;
+        allSoundOffEvent.data1 = 120; // All Sound Off
+        allSoundOffEvent.data2 = 0;   // Value is not used for All Sound Off
+        fireEvent(allSoundOffEvent);
+    }
+}
+
 void EventProcessor::setParameter(ControllableParameter param, int value)
 {
     switch (param)

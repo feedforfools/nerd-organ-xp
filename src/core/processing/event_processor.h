@@ -14,7 +14,7 @@ class EventProcessor : public IMusicalEventProcessor, public IControllable
         
         void setParameter(ControllableParameter param, int value) override;
 
-        void setEnabled(bool enabled) { isEnabled = enabled; }
+        void setEnabled(bool enabled);
         void setTranspose(int semitones) { transpose = semitones; }
         void setMidiChannel(uint8_t channel) { midiChannel = channel; }
         void setHighTriggerMode(bool mode) { highTriggerMode = mode; }
