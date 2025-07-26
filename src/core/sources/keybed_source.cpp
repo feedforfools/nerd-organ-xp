@@ -47,17 +47,33 @@ void KeybedSource::onKeyEvent(const KeyEvent& event)
     }
 }
 
+// int KeybedSource::calculateVelocity(uint32_t t)
+// {
+//     // TODO: separate velocity calculation in another class with different algorithms
+//     // TODO: add support for different velocity curves configurable via system settings
+//     if(t < 11) return 127;
+//     if(t < 28) return int(-1.588 * t + 142.882);
+//     if(t < 41) return int(-1.5385 * t + 141.5385);
+//     if(t < 67) return int(-0.7692 * t + 110.769);
+//     if(t < 111) return int(-0.4545 * t + 90);
+//     if(t < 181) return int(-0.2857 * t + 71.4286);
+//     if(t < 330) return int(-0.1267 * t + 42.8);
+//     if(t > 329) return 1;
+//     return 1;
+// }
+
 int KeybedSource::calculateVelocity(uint32_t t)
 {
-    // TODO: separate velocity calculation in another class with different algorithms
-    // TODO: add support for different velocity curves configurable via system settings
-    if(t < 11) return 127;
-    if(t < 28) return int(-1.588 * t + 142.882);
-    if(t < 41) return int(-1.5385 * t + 141.5385);
-    if(t < 67) return int(-0.7692 * t + 110.769);
-    if(t < 111) return int(-0.4545 * t + 90);
-    if(t < 181) return int(-0.2857 * t + 71.4286);
-    if(t < 330) return int(-0.1267 * t + 42.8);
-    if(t > 329) return 1;
-    return 1;
+    const float CALIBRATED_TIME_FASTEST = 2.0f;
+    const float CALIBRATED_TIME_SLOWEST = 250.0f;
+    const float VELOCITY_EXPONENT = 6.3f;
+
+    float clamped_t = static_cast<float>(t);
+    if (clamped_t < CALIBRATED_TIME_FASTEST) clamped_t = CALIBRATED_TIME_FASTEST;
+    if (clamped_t > CALIBRATED_TIME_SLOWEST) clamped_t = CALIBRATED_TIME_SLOWEST;
+    float normalized_velocity = (CALIBRATED_TIME_SLOWEST - clamped_t) / (CALIBRATED_TIME_SLOWEST - CALIBRATED_TIME_FASTEST);
+    float curved_velocity = pow(normalized_velocity, VELOCITY_EXPONENT);
+    int velocity = 1 + static_cast<int>(curved_velocity * 126.0f);
+
+    return velocity;
 }
