@@ -66,6 +66,7 @@ void setup()
    routingManager.addSink(&hwMidiOut2);
    routingManager.addProcessor(&nordProcessor);
    routingManager.addProcessor(&jd08Processor);
+   routingManager.addProcessor(&damperProcessor);
 
    Logger::log("Initializing USB Host System...");
    usbHostManager.init();
@@ -82,7 +83,7 @@ void setup()
    routingManager.createRoute(PORT_ID_KEYBED, nordProcessor.getPortId());
    routingManager.createRoute(nordProcessor.getPortId(), PORT_ID_HW_MIDI_OUT_1);
    routingManager.createRoute(PORT_ID_KEYBED, jd08Processor.getPortId());
-   routingManager.createRoute(PORT_ID_HW_MIDI_IN_1, damperProcessor.getPortId());
+   routingManager.createRoute(hwMidiIn1.getPortId(), damperProcessor.getPortId());
    routingManager.createRoute(jd08Processor.getPortId(), PORT_ID_HW_MIDI_OUT_2); // Backup route for HW MIDI OUT 2 (but in reality JD08 will be connected to USB only)
    routingManager.createRoute(damperProcessor.getPortId(), PORT_ID_HW_MIDI_OUT_2); // Backup route for damper signals to HW MIDI OUT 2 (but in reality JD08 will be connected to USB only)
    // Control mappings
