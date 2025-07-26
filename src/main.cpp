@@ -3,6 +3,7 @@
 #include "config/config.h"
 #include "core/control_mapper.h"
 #include "core/processing/event_processor.h"
+#include "core/processing/custom_processor.h"
 #include "core/routing/routing_manager.h"
 #include "core/sinks/hw_midi_output_sink.h"
 #include "core/sources/hw_midi_input_source.h"
@@ -32,6 +33,7 @@ ControlMapper controlMapper;
 KeybedSource keybedSource;
 EventProcessor nordProcessor(PORT_ID_NORD_PROCESSOR); // TODO: Create a method for generating unique port IDs
 EventProcessor jd08Processor(PORT_ID_JD08_PROCESSOR);
+CustomEventProcessor damperProcessor(PORT_ID_DAMPER_PROCESSOR, MusicalEventType::CONTROL_CHANGE, 1, 64);
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI_IN_1);
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI_OUT_1);
@@ -80,12 +82,16 @@ void setup()
    routingManager.createRoute(PORT_ID_KEYBED, nordProcessor.getPortId());
    routingManager.createRoute(nordProcessor.getPortId(), PORT_ID_HW_MIDI_OUT_1);
    routingManager.createRoute(PORT_ID_KEYBED, jd08Processor.getPortId());
+   routingManager.createRoute(PORT_ID_HW_MIDI_IN_1, damperProcessor.getPortId());
    routingManager.createRoute(jd08Processor.getPortId(), PORT_ID_HW_MIDI_OUT_2); // Backup route for HW MIDI OUT 2 (but in reality JD08 will be connected to USB only)
+   routingManager.createRoute(damperProcessor.getPortId(), PORT_ID_HW_MIDI_OUT_2); // Backup route for damper signals to HW MIDI OUT 2 (but in reality JD08 will be connected to USB only)
    // Control mappings
    controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
    controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 1, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
    controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &jd08Processor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
    controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 2, .target = &jd08Processor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
+   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 0, .target = &damperProcessor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 1});
+   controlMapper.addMapping({.switchId = THREE_WAY_SWITCH_ID, .triggerState = 2, .target = &damperProcessor, .parameter = ControllableParameter::PROCESSOR_ENABLE, .value = 0});
    controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 0, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_HIGH_TRIGGER_MODE, .value = 0});
    controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 1, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_HIGH_TRIGGER_MODE, .value = 1});
    controlMapper.addMapping({.switchId = TWO_WAY_SWITCH_ID, .triggerState = 0, .target = &nordProcessor, .parameter = ControllableParameter::PROCESSOR_MIDI_CHANNEL, .value = NORD_MAIN_MIDI_CHANNEL});

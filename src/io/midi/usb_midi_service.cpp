@@ -48,6 +48,7 @@ void UsbMidiService::onUsbDeviceConnected(USBDriver* device, AppDeviceType type)
                 routingManager.addSource(newSource); // Not used
                 routingManager.addSink(newSink);
                 routingManager.createRoute(PORT_ID_JD08_PROCESSOR, PORT_ID_JD08);
+                routingManager.createRoute(PORT_ID_DAMPER_PROCESSOR, PORT_ID_JD08);
                 activePorts[device] = {newSource, newSink};
                 Logger::log("Created Sink for Roland JD08 USB MIDI device with Port ID: " + String(newDevicePortId));
             } 

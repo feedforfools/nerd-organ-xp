@@ -21,6 +21,7 @@ constexpr PortId PORT_ID_SYSTEM_CONFIG  = 110;      // Sink for handling system-
 // Processors
 constexpr PortId PORT_ID_NORD_PROCESSOR = 150;
 constexpr PortId PORT_ID_JD08_PROCESSOR = 151;
+constexpr PortId PORT_ID_DAMPER_PROCESSOR = 152;
 
 // Custom device port IDs
 constexpr PortId PORT_ID_JD08           = 170;      // Custom device (e.g. JD-08) port ID
